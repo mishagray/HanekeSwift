@@ -58,8 +58,8 @@ public enum JSON : DataLiteralConvertable {
     
     
     public init?(data value: NSData) {
-        var error : NSError?
-        if let object : AnyObject = NSJSONSerialization.JSONObjectWithData(value, options: NSJSONReadingOptions.allZeros, error: &error) {
+        do {
+            let object : AnyObject = try NSJSONSerialization.JSONObjectWithData(value, options: NSJSONReadingOptions())
             switch (object) {
             case let dictionary as [String:AnyObject]:
                 self = .Dictionary(dictionary)
@@ -68,8 +68,8 @@ public enum JSON : DataLiteralConvertable {
             default:
                 return nil
             }
-        } else {
-            Log.error("Invalid JSON data", error)
+        } catch  {
+            Log.error("Invalid JSON data", error as NSError)
             return nil
         }
     }
@@ -77,15 +77,23 @@ public enum JSON : DataLiteralConvertable {
     public func toData() -> NSData? {
         switch (self) {
         case .Dictionary(let dictionary):
-            return NSJSONSerialization.dataWithJSONObject(dictionary, options: NSJSONWritingOptions.allZeros, error: nil)
+            do {
+                return try NSJSONSerialization.dataWithJSONObject(dictionary, options: NSJSONWritingOptions())
+            } catch _ {
+                return nil
+            }
         case .Array(let array):
-            return NSJSONSerialization.dataWithJSONObject(array, options: NSJSONWritingOptions.allZeros, error: nil)
+            do {
+                return try NSJSONSerialization.dataWithJSONObject(array, options: NSJSONWritingOptions())
+            } catch _ {
+                return nil
+            }
         }
     }
     
     public var array : [AnyObject]! {
         switch (self) {
-        case .Dictionary(let _):
+        case .Dictionary(_):
             return nil
         case .Array(let array):
             return array
@@ -96,7 +104,7 @@ public enum JSON : DataLiteralConvertable {
         switch (self) {
         case .Dictionary(let dictionary):
             return dictionary
-        case .Array(let _):
+        case .Array(_):
             return nil
         }
     }

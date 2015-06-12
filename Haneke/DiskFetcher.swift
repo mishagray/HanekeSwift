@@ -54,36 +54,26 @@ public class DiskFetcher<T : DataLiteralConvertable> : Fetcher<T> {
             return
         }
         
-        var error: NSError?
-        let data = NSData(contentsOfFile: self.path, options: NSDataReadingOptions.allZeros, error: &error)
-        if data == nil {
+        do {
+            let data = try NSData(contentsOfFile: self.path, options: NSDataReadingOptions())
+            if let value = T(data:(data as! T.DataLiteralType)) {
+                dispatch_async(dispatch_get_main_queue(), {
+                    if self.cancelled {
+                        return
+                    }
+                    succeed(value)
+                })
+            }
+            else {
+                let localizedFormat = NSLocalizedString("Failed to convert value from data at path %@", comment: "Error description")
+                let description = String(format:localizedFormat, self.path)
+                throw errorWithCode(HanekeGlobals.DiskFetcher.ErrorCode.InvalidData.rawValue, description: description)
+            }
+            
+        } catch {
             dispatch_async(dispatch_get_main_queue()) {
-                fail(error)
+                fail(error as NSError)
             }
-            return
         }
-        
-        if self.cancelled {
-            return
-        }
-        
-        let value = T(data:(data as! T.DataLiteralType))
-        
-        if value == nil {
-            let localizedFormat = NSLocalizedString("Failed to convert value from data at path %@", comment: "Error description")
-            let description = String(format:localizedFormat, self.path)
-            let error = errorWithCode(HanekeGlobals.DiskFetcher.ErrorCode.InvalidData.rawValue, description: description)
-            dispatch_async(dispatch_get_main_queue()) {
-                fail(error)
-            }
-            return
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), {
-            if self.cancelled {
-                return
-            }
-            succeed(value!)
-        })
     }
 }

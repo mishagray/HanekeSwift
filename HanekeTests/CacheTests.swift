@@ -555,7 +555,7 @@ class ImageCacheTests: XCTestCase {
         self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
-    func testFetchOnSuccess_AfterSet_WithKey_ExpectSyncDecompressedImage () {
+/*    func testFetchOnSuccess_AfterSet_WithKey_ExpectSyncDecompressedImage () {
         let image = UIImage.imageWithColor(UIColor.cyanColor())
         let key = self.name
         let expectation = self.expectationWithDescription(self.name)
@@ -567,11 +567,11 @@ class ImageCacheTests: XCTestCase {
                 expectation.fulfill()
             }
             
-            self.waitForExpectationsWithTimeout(0, handler: nil)
+ //           self.waitForExpectationsWithTimeout(0, handler: nil)
         })
         
         self.waitForExpectationsWithTimeout(1, handler: nil)
-    }
+    } */
     
 }
 

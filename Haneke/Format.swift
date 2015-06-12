@@ -8,7 +8,7 @@
 
 import UIKit
 
-public struct Format<T> {
+public class Format<T> {
     
     public let name : String
     
